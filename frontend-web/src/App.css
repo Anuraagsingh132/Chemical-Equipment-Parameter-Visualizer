@@ -1,0 +1,4 @@
+/* App-level styles */
+.loading-screen {
+  @apply min-h-screen flex items-center justify-center bg-background-dark;
+}
