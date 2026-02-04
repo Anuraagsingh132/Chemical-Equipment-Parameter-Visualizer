@@ -1,4 +1,5 @@
 [build]
+  base = "frontend-web"
   command = "npm run build"
   publish = "dist"
 
@@ -9,4 +10,3 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  VITE_API_URL = "https://your-render-backend.onrender.com/api"
