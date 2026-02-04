@@ -92,23 +92,41 @@ def generate_pdf_report(dataset, type_distribution: dict) -> BytesIO:
     elements.append(Spacer(1, 30))
     elements.append(Paragraph("Equipment Details", heading_style))
     
-    eq_data = [['Name', 'Type', 'Flowrate', 'Pressure', 'Temperature']]
+    # Status logic based on temperature (matches web frontend)
+    def get_status(temp):
+        if temp > 150:
+            return 'Offline'
+        elif temp >= 90:
+            return 'Warning'
+        else:
+            return 'Active'
+    
+    eq_data = [['ID', 'Name', 'Type', 'Flowrate', 'Pressure', 'Temp', 'Status']]
     for eq in dataset.equipment.all()[:20]:  # Limit to first 20
         eq_data.append([
-            eq.name, eq.equipment_type,
-            f'{eq.flowrate:.1f}', f'{eq.pressure:.1f}', f'{eq.temperature:.1f}'
+            f'#{eq.id}',
+            eq.name, 
+            eq.equipment_type,
+            f'{eq.flowrate:.1f}',
+            f'{eq.pressure:.1f}',
+            f'{eq.temperature:.1f}',
+            get_status(eq.temperature)
         ])
     
-    eq_table = Table(eq_data, colWidths=[1.5*inch, 1.2*inch, 1*inch, 1*inch, 1*inch])
+    eq_table = Table(eq_data, colWidths=[0.5*inch, 1.3*inch, 1*inch, 0.8*inch, 0.8*inch, 0.7*inch, 0.7*inch])
     eq_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#7C3AED')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),  # Headers centered
+        ('ALIGN', (0, 1), (0, -1), 'CENTER'),  # ID column centered
+        ('ALIGN', (1, 1), (2, -1), 'LEFT'),    # Name, Type left-aligned
+        ('ALIGN', (3, 1), (5, -1), 'RIGHT'),   # Flowrate, Pressure, Temp right-aligned
+        ('ALIGN', (6, 1), (6, -1), 'CENTER'),  # Status centered
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('FONTSIZE', (0, 0), (-1, 0), 9),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
         ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#D1D5DB')),
-        ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F9FAFB')]),
     ]))
     elements.append(eq_table)

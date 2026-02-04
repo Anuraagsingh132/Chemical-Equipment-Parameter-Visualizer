@@ -20,13 +20,37 @@ const EquipmentTable = ({ equipment }) => {
         return icons[type] || 'settings';
     };
 
-    const getStatusBadge = (index) => {
-        const statuses = [
-            { label: 'Active', color: 'green' },
-            { label: 'Warning', color: 'amber' },
-            { label: 'Offline', color: 'slate' },
-        ];
-        return statuses[index % statuses.length];
+    // Status logic based on temperature thresholds (explained in documentation)
+    // Active: temperature < 90°C (normal operating range)
+    // Warning: temperature 90-150°C (elevated, needs monitoring)
+    // Offline: temperature > 150°C (critical, requires attention)
+    const getStatusBadge = (equipment) => {
+        const temp = equipment.temperature || 0;
+        if (temp > 150) {
+            return {
+                label: 'Offline',
+                bgColor: 'rgba(100, 116, 139, 0.1)',      // slate
+                textColor: '#94a3b8',                     // slate-400
+                borderColor: 'rgba(100, 116, 139, 0.2)',
+                dotColor: '#64748b'                       // slate-500
+            };
+        } else if (temp >= 90) {
+            return {
+                label: 'Warning',
+                bgColor: 'rgba(245, 158, 11, 0.1)',       // amber
+                textColor: '#fbbf24',                     // amber-400
+                borderColor: 'rgba(245, 158, 11, 0.2)',
+                dotColor: '#f59e0b'                       // amber-500
+            };
+        } else {
+            return {
+                label: 'Active',
+                bgColor: 'rgba(34, 197, 94, 0.1)',        // green
+                textColor: '#4ade80',                     // green-400
+                borderColor: 'rgba(34, 197, 94, 0.2)',
+                dotColor: '#22c55e'                       // green-500
+            };
+        }
     };
 
     return (
@@ -45,15 +69,15 @@ const EquipmentTable = ({ equipment }) => {
                             <th className="px-6 py-4 font-semibold">ID</th>
                             <th className="px-6 py-4 font-semibold">Equipment Name</th>
                             <th className="px-6 py-4 font-semibold">Type</th>
-                            <th className="px-6 py-4 font-semibold">Flowrate</th>
-                            <th className="px-6 py-4 font-semibold">Pressure</th>
-                            <th className="px-6 py-4 font-semibold">Temperature</th>
-                            <th className="px-6 py-4 font-semibold">Status</th>
+                            <th className="px-6 py-4 font-semibold text-right">Flowrate</th>
+                            <th className="px-6 py-4 font-semibold text-right">Pressure</th>
+                            <th className="px-6 py-4 font-semibold text-right">Temperature</th>
+                            <th className="px-6 py-4 font-semibold text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-glass-border text-sm">
                         {equipment.map((item, index) => {
-                            const status = getStatusBadge(index);
+                            const status = getStatusBadge(item);
                             return (
                                 <tr key={item.id} className="group hover:bg-white/5 transition-colors">
                                     <td className="px-6 py-4 text-slate-400 font-mono">#{item.id}</td>
@@ -66,12 +90,22 @@ const EquipmentTable = ({ equipment }) => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-slate-300">{item.equipment_type}</td>
-                                    <td className="px-6 py-4 text-slate-300">{item.flowrate?.toFixed(1)} L/min</td>
-                                    <td className="px-6 py-4 text-slate-300">{item.pressure?.toFixed(1)} Bar</td>
-                                    <td className="px-6 py-4 text-slate-300">{item.temperature?.toFixed(1)} °C</td>
-                                    <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center gap-1.5 rounded-full bg-${status.color}-500/10 px-2.5 py-1 text-xs font-medium text-${status.color}-400 border border-${status.color}-500/20`}>
-                                            <span className={`h-1.5 w-1.5 rounded-full bg-${status.color}-500`}></span>
+                                    <td className="px-6 py-4 text-slate-300 text-right font-mono">{item.flowrate?.toFixed(1)} L/min</td>
+                                    <td className="px-6 py-4 text-slate-300 text-right font-mono">{item.pressure?.toFixed(1)} Bar</td>
+                                    <td className="px-6 py-4 text-slate-300 text-right font-mono">{item.temperature?.toFixed(1)} °C</td>
+                                    <td className="px-6 py-4 text-center">
+                                        <span
+                                            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium border"
+                                            style={{
+                                                backgroundColor: status.bgColor,
+                                                color: status.textColor,
+                                                borderColor: status.borderColor
+                                            }}
+                                        >
+                                            <span
+                                                className="h-1.5 w-1.5 rounded-full"
+                                                style={{ backgroundColor: status.dotColor }}
+                                            ></span>
                                             {status.label}
                                         </span>
                                     </td>

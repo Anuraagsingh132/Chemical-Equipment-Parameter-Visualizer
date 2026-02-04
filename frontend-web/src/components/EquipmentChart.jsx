@@ -133,18 +133,26 @@ const EquipmentChart = ({ stats }) => {
                     </div>
 
                     {/* Legend */}
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-3 w-full px-2">
-                        {labels.map((label, index) => (
-                            <div key={label} className="flex items-center gap-2">
-                                <span
-                                    className="w-2 h-2 rounded-full"
-                                    style={{ backgroundColor: colors[index] }}
-                                ></span>
-                                <span className="text-xs text-slate-300 truncate">
-                                    {label} ({Math.round(data[index] / total * 100)}%)
-                                </span>
-                            </div>
-                        ))}
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full px-2">
+                        {labels.map((label, index) => {
+                            // Shorten known long labels for display
+                            const labelMap = {
+                                'Heat Exchanger': 'Heat Exch.',
+                                'Distillation Column': 'Distil. Col.',
+                            };
+                            const shortLabel = labelMap[label] || (label.length > 12 ? label.substring(0, 10) + '…' : label);
+                            return (
+                                <div key={label} className="flex items-center gap-2" title={`${label}: ${data[index]} (${Math.round(data[index] / total * 100)}%)`}>
+                                    <span
+                                        className="w-2 h-2 rounded-full flex-shrink-0"
+                                        style={{ backgroundColor: colors[index] }}
+                                    ></span>
+                                    <span className="text-xs text-slate-300">
+                                        {shortLabel} ({Math.round(data[index] / total * 100)}%)
+                                    </span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

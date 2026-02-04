@@ -1,6 +1,7 @@
-const StatsCards = ({ stats }) => {
+const StatsCards = ({ stats, hasHistory = false }) => {
     if (!stats) return null;
 
+    // Trends only show if we have historical data to compare
     const cards = [
         {
             label: 'Total Equipment',
@@ -8,8 +9,8 @@ const StatsCards = ({ stats }) => {
             unit: 'Units',
             icon: 'precision_manufacturing',
             color: 'blue',
-            trend: '+4.2%',
-            trendLabel: 'vs last month'
+            trend: null,
+            trendLabel: 'Current dataset'
         },
         {
             label: 'Avg Flowrate',
@@ -17,8 +18,8 @@ const StatsCards = ({ stats }) => {
             unit: 'L/min',
             icon: 'water_drop',
             color: 'cyan',
-            trend: '+1.8%',
-            trendLabel: 'Optimization active'
+            trend: null,
+            trendLabel: 'Measured value'
         },
         {
             label: 'Sys Pressure',
@@ -35,7 +36,7 @@ const StatsCards = ({ stats }) => {
             unit: '°C',
             icon: 'thermostat',
             color: 'red',
-            trend: 'Stable',
+            trend: null,
             trendLabel: 'Within range'
         }
     ];
